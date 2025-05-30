@@ -6,14 +6,46 @@ import (
 
 var LowUrgentionMentalHealth = [20]string{"stres", "cemas", "depresi", "panik", "khawatir", "lelah", "burnout", "kelelahan_mental", "gangguan_tidur", "insomnia", "sedih", "murung", "trauma", "overthinking", "minder", "kecewa", "kesepian", "takut", "tegang", "mood swing"}
 var HighUrgentionMentalHealth = [10]string{"bunuh_diri", "menyakiti_diri", "tidak_sanggup", "putus_asa", "ingin_mati", "sudah_tidak_tahan", "hilang_harapan", "ingin_menghilang", "tidak_berguna", "tidak_ada_yang_peduli"}
+var ActivitySuggestionsLow = [10]string{
+	"Bercerita ke teman dekat",
+	"Berjalan santai di pagi atau sore hari",
+	"Mendengarkan musik yang menenangkan",
+	"Meditasi ringan selama 5-10 menit",
+	"Menggambar atau mewarnai",
+	"Menonton film favorit yang menyenangkan",
+	"Membaca buku yang disukai",
+	"Melakukan peregangan atau olahraga ringan",
+	"Tidur lebih awal dan cukup istirahat",
+	"Membuat to-do list atau rencana mingguan",
+	"Mendengarkan podcast inspiratif atau edukatif",
+	"Mencoba teknik pernapasan dalam (deep breathing)",
+	"Membatasi waktu media sosial dan screen time",
+}
+
+var ActivitySuggestionsHigh = [10]string{
+	"Segera hubungi layanan bantuan profesional",
+	"Ceritakan perasaanmu pada orang yang kamu percaya",
+	"Temui guru, konselor, atau tenaga kesehatan terdekat",
+	"Jauhkan diri dari benda atau hal yang membahayakan diri",
+	"Ambil waktu untuk istirahat di tempat yang tenang",
+	"Tuliskan isi pikiranmu di jurnal atau kertas",
+	"Coba hubungi sahabat lama atau anggota keluarga",
+	"Ingatkan diri bahwa kamu berharga dan tidak sendirian",
+	"Berada di dekat orang lain walau hanya duduk bersama",
+	"Cari bantuan dari layanan konseling online atau hotline",
+	"Tonton video atau konten yang membuatmu tersenyum atau tertawa ringan",
+	"Mengucapkan doa atau kalimat spiritual yang menenangkan",
+	"Dekatkan diri kepada tuhan dan senantiasa meningatnya",
+}
 
 //var ProductivityKey = [13]string{"semangat", "motivasi", "tidak fokus", "malas", "kehilangan arah", "bingung", "distraksi", "manajemen waktu", "target", "tujuan", "goals", "disiplin", "tanggung jawab"}
 
 type history struct {
-	id           int //mewakili urutan chatting
-	input, saran string
-	keyword      []string
-	urgensi      int
+	id      int //mewakili urutan chatting
+	input   string
+	keyword [10]string
+	saran   []string
+	urgensi int
 }
 
 type arrChat [100]history
@@ -29,14 +61,19 @@ func menu() {
 		fmt.Println("Pilih kategori:")
 		fmt.Println("[1] Kesehatan Mental")
 		fmt.Println("[2] Produktivitas")
+		fmt.Println("[3] Riwayat chat")
 		fmt.Println("Ketik 'exit' untuk keluar.")
 		fmt.Scan(&input)
 		input = LowerCase(input)
 		switch input {
 		case "1":
 			mentalHealthMode(&chat, &nHistory)
+			ClearScreen()
 		case "2":
 			productivityMode()
+			ClearScreen()
+		case "3":
+
 		case "exit":
 			access = false
 		default:
@@ -47,23 +84,7 @@ func menu() {
 
 // PRODUKTIVITAS
 func productivityMode() {
-	/*fmt.Println("\n Mode Produktivitas. Ketik 'menu' untuk kembali.")
-	var input, sentence string
-	for {
-		var kata, sentence string
-		var i, nHistory int
-		i = 0
-		fmt.Println("Anda : ")
-		fmt.Scan(&kata)
-		if input == "menu" {
-			fmt.Println("\nKembali ke menu utama.\n")
-			return
-		}
-		for dotDetector(kata){
-			sentence = sentence + kata + " "
-			fmt.Scan(&kata)
-		}
-	}*/
+	
 }
 
 // KESEHATAN MENTAL  NOTE : MASIH PERTIMBANGAN UNTUK PEMAKAIAN BREAK
@@ -71,7 +92,7 @@ func mentalHealthMode(chat *arrChat, nHistory *int) {
 	for {
 		fmt.Println("\nMode Kesehatan Mental. Ketik 'menu' untuk kembali.")
 		var toMenu string
-		fmt.Print("\njika ingin melanjutkan ketik apa saja\n")
+		fmt.Print("jika ingin melanjutkan ketik apa saja\n")
 		fmt.Scan(&toMenu)
 		if toMenu == "menu" {
 			fmt.Println("\nKembali ke menu utama.\n")
@@ -81,7 +102,6 @@ func mentalHealthMode(chat *arrChat, nHistory *int) {
 			chatsession(&*chat, *nHistory)
 			chat[*nHistory].id = *nHistory + 1
 			*nHistory = *nHistory + 1
-			fmt.Print(*chat)
 		}
 	}
 }
@@ -153,7 +173,6 @@ func rangkaiKalimat(chat *arrChat, i int, listkata *[]string) {
 		*listkata = append(*listkata, kata)
 	}
 	chat[i].input = sentence
-	fmt.Println(*listkata)
 }
 
 func chatsession(chat *arrChat, i int) {
@@ -162,35 +181,7 @@ func chatsession(chat *arrChat, i int) {
 	keywordinput(&*chat, i, listkata)
 }
 
-/*sorting riwayat
-func selectionSort(arr []int) {
-	n := ....
-	for i := 0; i < n-1; i++ {
-		minIdx := i
-		for j := i + 1; j < n; j++ {
-			if arr[j] < arr[minIdx] {
-				minIdx = j
-			}
-		}
-		arr[i], arr[minIdx] = arr[minIdx], arr[i]
-	}
-}
-
-func insertionSort(arr []int) {
-	n := ....
-	for i := 1; i < n; i++ {
-		key := arr[i]
-		j := i - 1
-
-		// Geser elemen yang lebih besar dari key ke kanan
-		for j >= 0 && arr[j] > key {
-			arr[j+1] = arr[j]
-			j--
-		}
-		arr[j+1] = key
-	}
-}*/
-//mencari keyword dengan urgensi tinggi dan rendah menggunakan function sequential search
+// mencari keyword dengan urgensi tinggi dan rendah menggunakan function sequential search
 func keywordinput(chat *arrChat, i int, listkata []string) {
 	var j, nKeyword int
 	for j = 0; j < len(listkata); j++ {
@@ -219,6 +210,54 @@ func keywordinput(chat *arrChat, i int, listkata []string) {
 	}
 }
 
-func ClearScreen() {
+func daftarSaran(chat *arrChat)
+/*sorting riwayat
+func selectionSort(arr []int) {
+	n := ....
+	for i := 0; i < n-1; i++ {
+		minIdx := i
+		for j := i + 1; j < n; j++ {
+			if arr[j] < arr[minIdx] {
+				minIdx = j
+			}
+		}
+		arr[i], arr[minIdx] = arr[minIdx], arr[i]
+	}
+}
+
+func insertionSort(arr []int) {
+	n := ....
+	for i := 1; i < n; i++ {
+		key := arr[i]
+		j := i - 1
+
+		// Geser elemen yang lebih besar dari key ke kanan
+		for j >= 0 && arr[j] > key {
+			arr[j+1] = arr[j]
+			j--
+		}
+		arr[j+1] = key
+	}
+}*/
+
+func binarySearch(arr []int, target int) int {
+	n := 
+	low := 0
+	high := n - 1
+
+	for low <= high {
+		mid := (low + high) / 2
+		if arr[mid] == target {
+			return mid
+		} else if arr[mid] < target {
+			low = mid + 1
+		} else {
+			high = mid - 1
+		}
+	}
+	return -1
+}
+
+func ClearScreen() { //
 	fmt.Print("\033[H\033[2J")
 }
