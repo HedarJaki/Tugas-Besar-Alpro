@@ -43,7 +43,7 @@ var ActivitySuggestionsHigh = [13]string{
 type history struct {
 	id      int //mewakili urutan chatting
 	input   string
-	keyword [10]string
+	keyword []string
 	saran   []string
 	urgensi int
 }
