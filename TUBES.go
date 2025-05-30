@@ -4,9 +4,9 @@ import (
 	"fmt"
 )
 
-var LowUrgentionMentalHealth = [20]string{"stres", "cemas", "depresi", "panik", "khawatir", "lelah", "burnout", "kelelahan_mental", "gangguan_tidur", "insomnia", "sedih", "murung", "trauma", "overthinking", "minder", "kecewa", "kesepian", "takut", "tegang", "mood swing"}
+var LowUrgentionMentalHealth = [20]string{"stress", "cemas", "depresi", "panik", "khawatir", "lelah", "burnout", "kelelahan_mental", "gangguan_tidur", "insomnia", "sedih", "murung", "trauma", "overthinking", "minder", "kecewa", "kesepian", "takut", "tegang", "mood swing"}
 var HighUrgentionMentalHealth = [10]string{"bunuh_diri", "menyakiti_diri", "tidak_sanggup", "putus_asa", "ingin_mati", "sudah_tidak_tahan", "hilang_harapan", "ingin_menghilang", "tidak_berguna", "tidak_ada_yang_peduli"}
-var ActivitySuggestionsLow = [10]string{
+var ActivitySuggestionsLow = [13]string{
 	"Bercerita ke teman dekat",
 	"Berjalan santai di pagi atau sore hari",
 	"Mendengarkan musik yang menenangkan",
@@ -22,7 +22,7 @@ var ActivitySuggestionsLow = [10]string{
 	"Membatasi waktu media sosial dan screen time",
 }
 
-var ActivitySuggestionsHigh = [10]string{
+var ActivitySuggestionsHigh = [13]string{
 	"Segera hubungi layanan bantuan profesional",
 	"Ceritakan perasaanmu pada orang yang kamu percaya",
 	"Temui guru, konselor, atau tenaga kesehatan terdekat",
@@ -84,7 +84,7 @@ func menu() {
 
 // PRODUKTIVITAS
 func productivityMode() {
-	
+
 }
 
 // KESEHATAN MENTAL  NOTE : MASIH PERTIMBANGAN UNTUK PEMAKAIAN BREAK
@@ -183,13 +183,12 @@ func chatsession(chat *arrChat, i int) {
 
 // mencari keyword dengan urgensi tinggi dan rendah menggunakan function sequential search
 func keywordinput(chat *arrChat, i int, listkata []string) {
-	var j, nKeyword int
+	var j int
 	for j = 0; j < len(listkata); j++ {
 		usersWord := listkata[j]
 		for k := 0; k < len(HighUrgentionMentalHealth); k++ {
 			if usersWord == HighUrgentionMentalHealth[k] {
-				chat[i].keyword[nKeyword] = usersWord
-				nKeyword++
+				chat[i].keyword = append(chat[i].keyword, usersWord)
 				if chat[i].urgensi == 0 {
 					chat[i].urgensi = 3
 				}
@@ -200,8 +199,7 @@ func keywordinput(chat *arrChat, i int, listkata []string) {
 		usersWord := listkata[j]
 		for k := 0; k < len(LowUrgentionMentalHealth); k++ {
 			if usersWord == LowUrgentionMentalHealth[k] {
-				chat[i].keyword[nKeyword] = usersWord
-				nKeyword++
+				chat[i].keyword = append(chat[i].keyword, usersWord)
 				if chat[i].urgensi == 0 {
 					chat[i].urgensi = 2
 				}
@@ -211,6 +209,7 @@ func keywordinput(chat *arrChat, i int, listkata []string) {
 }
 
 func daftarSaran(chat *arrChat)
+
 /*sorting riwayat
 func selectionSort(arr []int) {
 	n := ....
@@ -238,10 +237,10 @@ func insertionSort(arr []int) {
 		}
 		arr[j+1] = key
 	}
-}*/
+}
 
 func binarySearch(arr []int, target int) int {
-	n := 
+	n :=
 	low := 0
 	high := n - 1
 
@@ -256,7 +255,7 @@ func binarySearch(arr []int, target int) int {
 		}
 	}
 	return -1
-}
+}*/
 
 func ClearScreen() { //
 	fmt.Print("\033[H\033[2J")
