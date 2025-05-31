@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
+	"time"
 )
 
 var LowUrgentionMentalHealth = [20]string{"stress", "cemas", "depresi", "panik", "khawatir", "lelah", "burnout", "kelelahan_mental", "gangguan_tidur", "insomnia", "sedih", "murung", "trauma", "overthinking", "minder", "kecewa", "kesepian", "takut", "tegang", "mood swing"}
@@ -60,18 +62,18 @@ func menu() {
 		fmt.Println("Selamat datang di Chatbot AI Go!")
 		fmt.Println("Pilih kategori:")
 		fmt.Println("[1] Kesehatan Mental")
-		fmt.Println("[2] Produktivitas")
+		fmt.Println("[2] Laporan Produktivitas")
 		fmt.Println("[3] Riwayat chat")
 		fmt.Println("Ketik 'exit' untuk keluar.")
 		fmt.Scan(&input)
 		input = LowerCase(input)
 		switch input {
 		case "1":
+			ClearScreen()
 			mentalHealthMode(&chat, &nHistory)
 			ClearScreen()
 		case "2":
-			productivityMode()
-			ClearScreen()
+			laporanProduktivitas(chat, nHistory)
 		case "3":
 
 		case "exit":
@@ -80,11 +82,6 @@ func menu() {
 			fmt.Println("Input Tidak Valid")
 		}
 	}
-}
-
-// PRODUKTIVITAS
-func productivityMode() {
-
 }
 
 // KESEHATAN MENTAL  NOTE : MASIH PERTIMBANGAN UNTUK PEMAKAIAN BREAK
@@ -135,20 +132,6 @@ func dotDetector(kata string) bool {
 	return false
 }
 
-// pendeteksi jika ada keyword yang sesuai, maka akan masuk ke array keyword untuk pemberian saran
-/*func keyDetectorHighUrgention(keyword *[10]string, word string, k *int) {
-	var i int
-	if dotDetector(word) {
-		word = dotRemover(word)
-	}
-	for i = 0; i < len(HighUrgentionMentalHealth); i++ {
-		if word == HighUrgentionMentalHealth[i] {
-			*keyword[*k] = word
-			*k++
-		}
-	}
-}*/
-
 // menghilangkan tanda titik dalam suatu kata
 func dotRemover(kata string) string {
 	var kataBaru string
@@ -179,6 +162,9 @@ func chatsession(chat *arrChat, i int) {
 	var listkata []string
 	rangkaiKalimat(&*chat, i, &listkata)
 	keywordinput(&*chat, i, listkata)
+	daftarSaran(&*chat, i)
+	fmt.Println(chat[i].keyword, chat[i].saran)
+	cetakSaran(*chat, i)
 }
 
 // mencari keyword dengan urgensi tinggi dan rendah menggunakan function sequential search
@@ -208,54 +194,67 @@ func keywordinput(chat *arrChat, i int, listkata []string) {
 	}
 }
 
-func daftarSaran(chat *arrChat)
-
-/*sorting riwayat
-func selectionSort(arr []int) {
-	n := ....
-	for i := 0; i < n-1; i++ {
-		minIdx := i
-		for j := i + 1; j < n; j++ {
-			if arr[j] < arr[minIdx] {
-				minIdx = j
+func daftarSaran(chat *arrChat, i int) {
+	rand.Seed(time.Now().UnixNano()) // Agar hasil acaknya beda setiap dijalankan
+	var j, k int
+	var index int
+	for j = 0; j < len(chat[i].keyword); j++ {
+		for k = 0; k < len(HighUrgentionMentalHealth); k++ {
+			if chat[i].keyword[j] == HighUrgentionMentalHealth[k] {
+				index = rand.Intn(len(ActivitySuggestionsHigh))
+				chat[i].saran = append(chat[i].saran, ActivitySuggestionsHigh[index])
 			}
 		}
-		arr[i], arr[minIdx] = arr[minIdx], arr[i]
+		for k = 0; k < len(LowUrgentionMentalHealth); k++ {
+			if chat[i].keyword[j] == LowUrgentionMentalHealth[k] {
+				index = rand.Intn(len(ActivitySuggestionsLow))
+				chat[i].saran = append(chat[i].saran, ActivitySuggestionsLow[index])
+			}
+		}
 	}
 }
 
-func insertionSort(arr []int) {
-	n := ....
-	for i := 1; i < n; i++ {
-		key := arr[i]
-		j := i - 1
-
-		// Geser elemen yang lebih besar dari key ke kanan
-		for j >= 0 && arr[j] > key {
-			arr[j+1] = arr[j]
-			j--
-		}
-		arr[j+1] = key
+// fungsi untuk mencetak aktivitas apa saja yang disarankan untuk user
+func cetakSaran(chat arrChat, i int) {
+	fmt.Print("Abrar.AI : berikut list aktivitas yang disarankan:\n")
+	for j := 0; j < len(chat[i].saran); j++ {
+		fmt.Printf("%d. %s\n", j+1, chat[i].saran[j])
 	}
+	fmt.Println()
 }
 
-func binarySearch(arr []int, target int) int {
-	n :=
-	low := 0
-	high := n - 1
+func laporanProduktivitas(chat arrChat, n int) {
+	var i, j, nSaran int
+	var laporanSaran [20]string
+	if n > 0 {
+		for i = 0; i < n; i++ {
+			for j = 0; j < len(chat[i].saran); j++ {
+				if isntExist(chat[i].saran[j], laporanSaran, nSaran) {
+					if nSaran < 20 {
+						laporanSaran[nSaran] = chat[i].saran[j]
+						nSaran++
+					}
+				}
+			}
+		}
+		fmt.Println("berikut daftar saran yang harus dilakukan dari chat yang anda lakukan")
+		for i = 0; i < nSaran; i++ {
+			fmt.Printf("%d. %s\n", i+1, laporanSaran[i])
+		}
+	} else {
+		fmt.Println("data percakapan kosong, lakukan konsultasi terlebih dahulu")
+	}
+	fmt.Println()
+}
 
-	for low <= high {
-		mid := (low + high) / 2
-		if arr[mid] == target {
-			return mid
-		} else if arr[mid] < target {
-			low = mid + 1
-		} else {
-			high = mid - 1
+func isntExist(kata string, arrSaran [20]string, n int) bool {
+	for i := 0; i < n; i++ {
+		if kata == arrSaran[i] {
+			return false
 		}
 	}
-	return -1
-}*/
+	return true
+}
 
 func ClearScreen() { //
 	fmt.Print("\033[H\033[2J")
