@@ -56,6 +56,7 @@ type arrChat [100]history
 func menu() {
 	var input string
 	var chat arrChat
+	var nID int = 1
 	var nHistory int
 	var access bool = true
 	for access {
@@ -70,12 +71,14 @@ func menu() {
 		switch input {
 		case "1":
 			ClearScreen()
-			mentalHealthMode(&chat, &nHistory)
+			mentalHealthMode(&chat, &nHistory, &nID)
 			ClearScreen()
 		case "2":
 			laporanProduktivitas(chat, nHistory)
 		case "3":
-
+			ClearScreen()
+			Riwayat(&chat, &nHistory)
+			ClearScreen()
 		case "exit":
 			access = false
 		default:
@@ -84,21 +87,22 @@ func menu() {
 	}
 }
 
-// KESEHATAN MENTAL  NOTE : MASIH PERTIMBANGAN UNTUK PEMAKAIAN BREAK
-func mentalHealthMode(chat *arrChat, nHistory *int) {
+// KESEHATAN MENTAL
+func mentalHealthMode(chat *arrChat, nHistory *int, nID *int) {
 	for {
 		fmt.Println("\nMode Kesehatan Mental. Ketik 'menu' untuk kembali.")
 		var toMenu string
 		fmt.Print("jika ingin melanjutkan ketik apa saja\n")
 		fmt.Scan(&toMenu)
 		if toMenu == "menu" {
-			fmt.Println("\nKembali ke menu utama.\n")
+			fmt.Println("\nKembali ke menu utama.")
 			break
 		} else {
 			fmt.Print("Anda : ")
 			chatsession(&*chat, *nHistory)
-			chat[*nHistory].id = *nHistory + 1
+			chat[*nHistory].id = *nID
 			*nHistory = *nHistory + 1
+			*nID = *nID + 1
 		}
 	}
 }
@@ -216,7 +220,7 @@ func daftarSaran(chat *arrChat, i int) {
 
 // fungsi untuk mencetak aktivitas apa saja yang disarankan untuk user
 func cetakSaran(chat arrChat, i int) {
-	fmt.Print("Abrar.AI : berikut list aktivitas yang disarankan:\n")
+	fmt.Print("berikut list aktivitas yang disarankan:\n")
 	for j := 0; j < len(chat[i].saran); j++ {
 		fmt.Printf("%d. %s\n", j+1, chat[i].saran[j])
 	}
@@ -258,4 +262,124 @@ func isntExist(kata string, arrSaran [20]string, n int) bool {
 
 func ClearScreen() { //
 	fmt.Print("\033[H\033[2J")
+}
+
+// sorting dari urgensi, yang mana berurgensi tinggi bernilai 3 dan urgensi rendah bernilai 2
+func sortingChatByUrgency(chat *arrChat, n int) {
+	var temp history
+	for i := 1; i < n; i++ {
+		temp = chat[i]
+		j := i
+		for j > 0 && chat[j-1].urgensi < temp.urgensi {
+			chat[j] = chat[j-1]
+			j--
+		}
+		chat[j] = temp
+	}
+}
+
+func sortingChatByID(chat *arrChat, n int) {
+	var pass, i, idx int
+	var temp history
+	for pass = 1; pass < n; pass++ {
+		idx = pass - 1
+		for i = pass; i < n; i++ {
+			if chat[idx].id > chat[i].id {
+				idx = i
+			}
+		}
+		temp = chat[pass-1]
+		chat[pass-1] = chat[idx]
+		chat[idx] = temp
+	}
+}
+
+// mencari ID yang sesuai dengan binary search
+func binarySearchID(chat arrChat, n int, targetID int) int {
+	var low, high, mid int
+	low = 0
+	high = n - 1
+	for low <= high {
+		mid = (high + low) / 2
+		if chat[mid].id > targetID {
+			high = mid - 1
+		} else if chat[mid].id < targetID {
+			low = mid + 1
+		} else {
+			return mid
+		}
+	}
+	return -1
+}
+
+func cetakriwayat(chat arrChat, n int) {
+	fmt.Println("-------------------------------------------------------")
+	for i := 0; i < n; i++ {
+		fmt.Println("ID :", chat[i].id)
+		fmt.Printf("Anda :\n%s\n", chat[i].input)
+		fmt.Println("Bot :")
+		cetakSaran(chat, i)
+		fmt.Println("-------------------------------------------------------")
+	}
+}
+
+func Riwayat(chat *arrChat, n *int) {
+	var pilih int
+	for {
+		cetakriwayat(*chat, *n)
+		fmt.Println("[1] urut berdasarkan urgensi")
+		fmt.Println("[2] urut berdasarkan waktu chat dilakukan")
+		fmt.Println("[3] hapus riwayat")
+		fmt.Println("[4] edit riwayat")
+		fmt.Println("[5] keluar")
+		fmt.Print("pilih dari 1 sampai 5 :")
+		fmt.Scan(&pilih)
+		switch pilih {
+		case 1:
+			sortingChatByUrgency(&*chat, *n)
+		case 2:
+			sortingChatByID(&*chat, *n)
+		case 3:
+			hapusRiwayat(&*chat, &*n)
+		case 4:
+			editRiwayat(&*chat, &*n)
+		}
+		if pilih == 5 {
+			break
+		}
+	}
+}
+
+func hapusRiwayat(chat *arrChat, n *int) {
+	var ID, target int
+	sortingChatByID(&*chat, *n)
+	fmt.Print("ID riwayat mana yang ingin dihapus:")
+	fmt.Scan(&ID)
+	target = binarySearchID(*chat, *n, ID)
+	if target != -1 {
+		for i := target; i < *n-1; i++ {
+			chat[i] = chat[i+1]
+		}
+		*n = *n - 1
+	} else {
+		fmt.Println("ID tidak ditemukan")
+	}
+}
+
+func editRiwayat(chat *arrChat, n *int) {
+	var ID, target int
+	sortingChatByID(&*chat, *n)
+	fmt.Print("ID riwayat mana yang ingin diedit:")
+	fmt.Scan(&ID)
+	target = binarySearchID(*chat, *n, ID)
+	if target != -1 {
+		chat[target].keyword = nil
+		chat[target].saran = nil
+		chat[target].urgensi = 0
+		fmt.Println("Silakan masukkan ulang chat Anda:")
+		chatsession(&*chat, target)
+		chat[target].id = ID
+	} else {
+		fmt.Println("ID tidak ditemukan")
+	}
 }
