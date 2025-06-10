@@ -97,7 +97,7 @@ func mentalHealthMode(chat *arrChat, nHistory *int, nID *int) {
 			break
 		} else {
 			fmt.Print("Anda : ")
-			chatsession(&*chat, *nHistory)
+			chatsession(chat, *nHistory)
 			chat[*nHistory].id = *nID
 			*nHistory = *nHistory + 1
 			*nID = *nID + 1
@@ -162,10 +162,9 @@ func rangkaiKalimat(chat *arrChat, i int, listkata *[]string) {
 
 func chatsession(chat *arrChat, i int) {
 	var listkata []string
-	rangkaiKalimat(&*chat, i, &listkata)
-	keywordinput(&*chat, i, listkata)
-	daftarSaran(&*chat, i)
-	fmt.Println(chat[i].keyword, chat[i].saran)
+	rangkaiKalimat(chat, i, &listkata)
+	keywordinput(chat, i, listkata)
+	daftarSaran(chat, i)
 	cetakSaran(*chat, i)
 }
 
@@ -218,7 +217,7 @@ func daftarSaran(chat *arrChat, i int) {
 
 // fungsi untuk mencetak aktivitas apa saja yang disarankan untuk user
 func cetakSaran(chat arrChat, i int) {
-	fmt.Print("berikut list aktivitas yang disarankan:\n")
+	fmt.Print("bot : berikut list aktivitas yang disarankan:\n")
 	for j := 0; j < len(chat[i].saran); j++ {
 		fmt.Printf("%d. %s\n", j+1, chat[i].saran[j])
 	}
@@ -334,13 +333,17 @@ func Riwayat(chat *arrChat, n *int) {
 		fmt.Scan(&pilih)
 		switch pilih {
 		case 1:
-			sortingChatByUrgency(&*chat, *n)
+			ClearScreen()
+			sortingChatByUrgency(chat, *n)
 		case 2:
-			sortingChatByID(&*chat, *n)
+			ClearScreen()
+			sortingChatByID(chat, *n)
 		case 3:
-			hapusRiwayat(&*chat, &*n)
+			hapusRiwayat(chat, n)
+			ClearScreen()
 		case 4:
-			editRiwayat(&*chat, &*n)
+			editRiwayat(chat, n)
+			ClearScreen()
 		}
 		if pilih == 5 {
 			break
@@ -371,7 +374,7 @@ func hapusRiwayat(chat *arrChat, n *int) {
 
 func editRiwayat(chat *arrChat, n *int) {
 	var ID, target int
-	sortingChatByID(&*chat, *n)
+	sortingChatByID(chat, *n)
 	fmt.Print("ID riwayat mana yang ingin diedit:")
 	fmt.Scan(&ID)
 	target = binarySearchID(*chat, *n, ID)
