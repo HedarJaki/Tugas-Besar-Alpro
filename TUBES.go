@@ -354,12 +354,9 @@ func hapusRiwayat(chat *arrChat, n *int) {
 		fmt.Println("Belum ada riwayat yang bisa dihapus.")
 		return
 	}
-
 	sortingChatByID(chat, *n)
-
 	fmt.Print("Masukkan ID riwayat yang ingin dihapus: ")
 	fmt.Scan(&ID)
-
 	index = binarySearchID(*chat, *n, ID)
 	if index != -1 {
 		for i := index; i < *n-1; i++ {
