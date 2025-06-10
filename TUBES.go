@@ -40,8 +40,6 @@ var ActivitySuggestionsHigh = [13]string{
 	"Dekatkan diri kepada tuhan dan senantiasa meningatnya",
 }
 
-//var ProductivityKey = [13]string{"semangat", "motivasi", "tidak fokus", "malas", "kehilangan arah", "bingung", "distraksi", "manajemen waktu", "target", "tujuan", "goals", "disiplin", "tanggung jawab"}
-
 type history struct {
 	id      int //mewakili urutan chatting
 	input   string
@@ -351,18 +349,26 @@ func Riwayat(chat *arrChat, n *int) {
 }
 
 func hapusRiwayat(chat *arrChat, n *int) {
-	var ID, target int
-	sortingChatByID(&*chat, *n)
-	fmt.Print("ID riwayat mana yang ingin dihapus:")
+	var ID, index int
+	if *n == 0 {
+		fmt.Println("Belum ada riwayat yang bisa dihapus.")
+		return
+	}
+
+	sortingChatByID(chat, *n)
+
+	fmt.Print("Masukkan ID riwayat yang ingin dihapus: ")
 	fmt.Scan(&ID)
-	target = binarySearchID(*chat, *n, ID)
-	if target != -1 {
-		for i := target; i < *n-1; i++ {
+
+	index = binarySearchID(*chat, *n, ID)
+	if index != -1 {
+		for i := index; i < *n-1; i++ {
 			chat[i] = chat[i+1]
 		}
 		*n = *n - 1
+		fmt.Println("Riwayat berhasil dihapus.")
 	} else {
-		fmt.Println("ID tidak ditemukan")
+		fmt.Println("ID tidak ditemukan.")
 	}
 }
 
