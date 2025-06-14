@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-var LowUrgentionMentalHealth = [20]string{"stress", "cemas", "depresi", "panik", "khawatir", "lelah", "burnout", "kelelahan_mental", "gangguan_tidur", "insomnia", "sedih", "murung", "trauma", "overthinking", "minder", "kecewa", "kesepian", "takut", "tegang", "mood swing"}
+var LowUrgentionMentalHealth = [20]string{"stress", "cemas", "depresi", "panik", "khawatir", "lelah", "burnout", "kelelahan_mental", "gangguan_tidur", "insomnia", "sedih", "murung", "trauma", "overthinking", "minder", "kecewa", "kesepian", "takut", "tegang", "mood_swing"}
 var HighUrgentionMentalHealth = [10]string{"bunuh_diri", "menyakiti_diri", "tidak_sanggup", "putus_asa", "ingin_mati", "sudah_tidak_tahan", "hilang_harapan", "ingin_menghilang", "tidak_berguna", "tidak_ada_yang_peduli"}
 var ActivitySuggestionsLow = [13]string{
 	"Bercerita ke teman dekat",
@@ -124,7 +124,7 @@ func LowerCase(kalimat string) string {
 	return newWord
 }
 
-// DOT DETECTOR
+// DOT DETECTOR (sequential search)
 func dotDetector(kata string) bool {
 	for i := 0; i < len(kata); i++ {
 		if kata[i] == '.' {
@@ -281,7 +281,7 @@ func sortingChatByID(chat *arrChat, n int) {
 	for pass = 1; pass < n; pass++ {
 		idx = pass - 1
 		for i = pass; i < n; i++ {
-			if chat[idx].id > chat[i].id {
+			if chat[idx].id < chat[i].id {
 				idx = i
 			}
 		}
@@ -298,9 +298,9 @@ func binarySearchID(chat arrChat, n int, targetID int) int {
 	high = n - 1
 	for low <= high {
 		mid = (high + low) / 2
-		if chat[mid].id > targetID {
+		if chat[mid].id < targetID {
 			high = mid - 1
-		} else if chat[mid].id < targetID {
+		} else if chat[mid].id > targetID {
 			low = mid + 1
 		} else {
 			return mid
@@ -359,38 +359,42 @@ func Riwayat(chat *arrChat, n *int) {
 func hapusRiwayat(chat *arrChat, n *int) {
 	var ID, index int
 	if *n == 0 {
-		fmt.Println("Belum ada riwayat yang bisa dihapus.")
-		return
-	}
-	sortingChatByID(chat, *n)
-	fmt.Print("Masukkan ID riwayat yang ingin dihapus: ")
-	fmt.Scan(&ID)
-	index = binarySearchID(*chat, *n, ID)
-	if index != -1 {
-		for i := index; i < *n-1; i++ {
-			chat[i] = chat[i+1]
-		}
-		*n = *n - 1
-		fmt.Println("Riwayat berhasil dihapus.")
+		fmt.Println("Belum ada riwayat percakapan.")
 	} else {
-		fmt.Println("ID tidak ditemukan.")
+		sortingChatByID(chat, *n)
+		fmt.Print("Masukkan ID riwayat yang ingin dihapus: ")
+		fmt.Scan(&ID)
+		index = binarySearchID(*chat, *n, ID)
+		if index != -1 {
+			for i := index; i < *n-1; i++ {
+				chat[i] = chat[i+1]
+			}
+			*n = *n - 1
+			fmt.Println("Riwayat berhasil dihapus.")
+		} else {
+			fmt.Println("ID tidak ditemukan.")
+		}
 	}
 }
 
 func editRiwayat(chat *arrChat, n *int) {
 	var ID, target int
-	sortingChatByID(chat, *n)
-	fmt.Print("ID riwayat mana yang ingin diedit:")
-	fmt.Scan(&ID)
-	target = binarySearchID(*chat, *n, ID)
-	if target != -1 {
-		chat[target].keyword = nil
-		chat[target].saran = nil
-		chat[target].urgensi = 0
-		fmt.Println("Silakan masukkan ulang chat Anda:")
-		chatsession(&*chat, target)
-		chat[target].id = ID
+	if *n == 0 {
+		fmt.Println("Belum ada riwayat percakapan.")
 	} else {
-		fmt.Println("ID tidak ditemukan")
+		sortingChatByID(chat, *n)
+		fmt.Print("ID riwayat mana yang ingin diedit:")
+		fmt.Scan(&ID)
+		target = binarySearchID(*chat, *n, ID)
+		if target != -1 {
+			chat[target].keyword = nil
+			chat[target].saran = nil
+			chat[target].urgensi = 0
+			fmt.Println("Silakan masukkan ulang chat Anda:")
+			chatsession(&*chat, target)
+			chat[target].id = ID
+		} else {
+			fmt.Println("ID tidak ditemukan")
+		}
 	}
 }
