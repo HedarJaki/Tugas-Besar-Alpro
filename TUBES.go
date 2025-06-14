@@ -313,9 +313,10 @@ func cetakriwayat(chat arrChat, n int) {
 	fmt.Println("-------------------------------------------------------")
 	for i := 0; i < n; i++ {
 		fmt.Println("ID :", chat[i].id)
-		fmt.Printf("Anda :\n%s\n", chat[i].input)
+		fmt.Printf("Anda : %s\n", chat[i].input)
 		fmt.Println("Bot :")
 		cetakSaran(chat, i)
+		fmt.Println("\nLevel Urgensi:", chat[i].urgensi)
 		fmt.Println("-------------------------------------------------------")
 	}
 }
